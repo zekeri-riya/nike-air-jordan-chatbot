@@ -1,5 +1,3 @@
-Certainly! Below is the full `README.md` content that you can copy and paste into your project:
-
 ```markdown
 # Nike Air Jordan Collection Chatbot
 
@@ -8,21 +6,6 @@ Certainly! Below is the full `README.md` content that you can copy and paste int
 This project is an AI-powered chatbot that assists customers in accessing product-related information from the Nike Air Jordan collection. It uses text information from the website and image data from product photos to help users find merchandise based on their preferences. The chatbot supports text queries, image queries, and voice queries.
 
 ## Project Structure
-
-```
-nike-air-jordan-chatbot/
-├── main.py
-├── .env
-├── requirements.txt
-├── README.md
-├── utils/
-│   ├── __init__.py
-│   ├── image_processing.py
-│   ├── openai_api.py
-│   ├── speech_recognition.py
-│   ├── text_to_speech.py
-│   ├── web_scraping.py
-```
 
 - **main.py**: The main script to run the chatbot interface.
 - **.env**: Environment file containing API keys.
