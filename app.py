@@ -66,7 +66,7 @@ def get_product_recommendations(products, user_query):
     """
 
     response = client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are an expert product recommendation assistant."},
             {"role": "user", "content": prompt}
@@ -74,14 +74,34 @@ def get_product_recommendations(products, user_query):
         max_tokens=300
     )
 
-    print("Debug response:", response)  # Debug print to understand the response structure
+    print("Debug response get_product_recommendations:", response)  # Debug print to understand the response structure
 
-    return response.choices[0].message.content
+    return response.choices[0].message['content']
+
+# Function to understand image content using OpenAI vision capabilities
+# def analyze_image(encoded_image):
+#     response = client.chat.completions.create(
+#         model="gpt-4o",
+#         messages=[
+#             {
+#                 "role": "user",
+#                 "content": [
+#                     {"type": "text", "text": "What’s in this image?"},
+#                     {"type": "text", "text": f"data:image/jpeg;base64,{encoded_image}"}
+#                 ]
+#             }
+#         ],
+#         max_tokens=300
+#     )
+
+#     print("Debug response:", response)  # Debug print to understand the response structure
+
+#     return response.choices[0].message['content']
 
 # Function to understand image content using OpenAI vision capabilities
 def analyze_image(encoded_image):
     response = client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=[
             {
                 "role": "user",
@@ -90,7 +110,7 @@ def analyze_image(encoded_image):
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": f"data:image/png;base64,{encoded_image}"
+                            "url": f"data:image/jpeg;base64,{encoded_image}"
                         }
                     }
                 ]
@@ -98,7 +118,12 @@ def analyze_image(encoded_image):
         ],
         max_tokens=300
     )
+
+    print("Debug response analyze_image:", response)  # Debug print to understand the response structure
+
     return response.choices[0].message.content
+
+
 
 # Function to convert text to speech and play it using pygame
 def speak_text(text):
@@ -114,12 +139,9 @@ def speak_text(text):
     # Clean up
     pygame.mixer.music.stop()
 
-# Function to upload an image file
+# Function to upload an image file using easygui
 def upload_image():
-    root = Tk()
-    root.withdraw()
-    file_path = filedialog.askopenfilename(title="Select an image file", filetypes=[("Image files", "*.jpg;*.jpeg;*.png")])
-    root.destroy()  # Properly close the Tkinter window
+    file_path = easygui.fileopenbox(title="Select an image file", filetypes=["*.jpg", "*.jpeg", "*.png"])
     return file_path
 
 # Enhanced chatbot interface
