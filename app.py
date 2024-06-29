@@ -76,27 +76,7 @@ def get_product_recommendations(products, user_query):
 
     print("Debug response get_product_recommendations:", response)  # Debug print to understand the response structure
 
-    return response.choices[0].message['content']
-
-# Function to understand image content using OpenAI vision capabilities
-# def analyze_image(encoded_image):
-#     response = client.chat.completions.create(
-#         model="gpt-4o",
-#         messages=[
-#             {
-#                 "role": "user",
-#                 "content": [
-#                     {"type": "text", "text": "What’s in this image?"},
-#                     {"type": "text", "text": f"data:image/jpeg;base64,{encoded_image}"}
-#                 ]
-#             }
-#         ],
-#         max_tokens=300
-#     )
-
-#     print("Debug response:", response)  # Debug print to understand the response structure
-
-#     return response.choices[0].message['content']
+    return response.choices[0].message.content
 
 # Function to understand image content using OpenAI vision capabilities
 def analyze_image(encoded_image):
@@ -123,8 +103,6 @@ def analyze_image(encoded_image):
 
     return response.choices[0].message.content
 
-
-
 # Function to convert text to speech and play it using pygame
 def speak_text(text):
     tts = gTTS(text=text, lang='en')
@@ -144,6 +122,24 @@ def upload_image():
     file_path = easygui.fileopenbox(title="Select an image file", filetypes=["*.jpg", "*.jpeg", "*.png"])
     return file_path
 
+# Function to recognize speech input
+def recognize_speech():
+    recognizer = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Please speak now...")
+        audio = recognizer.listen(source)
+
+    try:
+        text = recognizer.recognize_google(audio)
+        print("You said:", text)
+        return text
+    except sr.UnknownValueError:
+        print("Google Speech Recognition could not understand the audio")
+        return None
+    except sr.RequestError as e:
+        print(f"Could not request results from Google Speech Recognition service; {e}")
+        return None
+
 # Enhanced chatbot interface
 def chatbot_interface():
     print("Welcome to Nike's Air Jordan Collection Chatbot!")
@@ -154,7 +150,7 @@ def chatbot_interface():
         print("\nHow would you like to interact with the chatbot?")
         print("1. Text Query")
         print("2. Image and Text Query")
-        print("3. Text and Voice Query")
+        print("3. Voice Query")
         print("Type 'exit' or 'quit' to end the session.")
         
         choice = input("Your choice: ").strip().lower()
@@ -180,8 +176,11 @@ def chatbot_interface():
                 response = "No image uploaded."
         
         elif choice == '3':
-            user_input = input("Enter your text query: ").strip()
-            response = get_product_recommendations(products, user_input)
+            user_input = recognize_speech()
+            if user_input:
+                response = get_product_recommendations(products, user_input)
+            else:
+                response = "Voice input not recognized."
         
         else:
             print("Invalid choice. Please try again.")
