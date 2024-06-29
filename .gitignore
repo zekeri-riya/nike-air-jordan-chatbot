@@ -1,0 +1,13 @@
+# Virtual environment
+env/
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Output files
+output.mp3
+
+# Environment variables
+.env

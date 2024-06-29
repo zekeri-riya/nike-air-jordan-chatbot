@@ -1,0 +1,10 @@
+openai
+requests 
+beautifulsoup4 
+pandas 
+pyttsx3 
+python-dotenv
+pillow
+gTTS 
+pygame
+
