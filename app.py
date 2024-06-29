@@ -43,12 +43,10 @@ def get_product_info(catalog_url):
     return products
 
 # Function to encode the image
-def encode_image(image_url):
-    response = requests.get(image_url)
-    image = Image.open(io.BytesIO(response.content))
-    buffered = io.BytesIO()
-    image.save(buffered, format="PNG")
-    return base64.b64encode(buffered.getvalue()).decode('utf-8')
+def encode_image(image_path):
+    with open(image_path, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+    return encoded_string
 
 # Function to get product recommendations from GPT-4
 def get_product_recommendations(products, user_query):
@@ -67,34 +65,28 @@ def get_product_recommendations(products, user_query):
     Based on the user's query, please provide 3 product recommendations from the Nike Air Jordan collection and explain why you recommended them.
     """
 
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=prompt,
-        max_tokens=300,
-        n=1,
-        stop=None,
-        temperature=0.7,
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "You are an expert product recommendation assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        max_tokens=300
     )
 
-    return response.choices[0].text.strip()
+    print("Debug response:", response)  # Debug print to understand the response structure
+
+    return response.choices[0].message.content
 
 # Function to understand image content using OpenAI vision capabilities
-def analyze_image(image_url):
-    encoded_image = encode_image(image_url)
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {OPENAI_API_KEY}"
-    }
-    payload = {
-        "model": "gpt-4",
-        "messages": [
+def analyze_image(encoded_image):
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[
             {
                 "role": "user",
                 "content": [
-                    {
-                        "type": "text",
-                        "text": "What’s in this image?"
-                    },
+                    {"type": "text", "text": "What’s in this image?"},
                     {
                         "type": "image_url",
                         "image_url": {
@@ -104,11 +96,9 @@ def analyze_image(image_url):
                 ]
             }
         ],
-        "max_tokens": 300
-    }
-
-    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
-    return response.json()['choices'][0]['message']['content']
+        max_tokens=300
+    )
+    return response.choices[0].message.content
 
 # Function to convert text to speech and play it using pygame
 def speak_text(text):
@@ -124,18 +114,57 @@ def speak_text(text):
     # Clean up
     pygame.mixer.music.stop()
 
-# Main chatbot interface
+# Function to upload an image file
+def upload_image():
+    root = Tk()
+    root.withdraw()
+    file_path = filedialog.askopenfilename(title="Select an image file", filetypes=[("Image files", "*.jpg;*.jpeg;*.png")])
+    root.destroy()  # Properly close the Tkinter window
+    return file_path
+
+# Enhanced chatbot interface
 def chatbot_interface():
     print("Welcome to Nike's Air Jordan Collection Chatbot!")
     speak_text("Welcome to Nike's Air Jordan Collection Chatbot!")
+    products = get_product_info("https://www.nike.com/w/mens-jordan-shoes-37eefznik1zy7ok1")
+    
     while True:
-        user_input = input("You: ")
-        if user_input.lower() in ['exit', 'quit']:
+        print("\nHow would you like to interact with the chatbot?")
+        print("1. Text Query")
+        print("2. Image and Text Query")
+        print("3. Text and Voice Query")
+        print("Type 'exit' or 'quit' to end the session.")
+        
+        choice = input("Your choice: ").strip().lower()
+        
+        if choice in ['exit', 'quit']:
             speak_text("Goodbye!")
             print("Goodbye!")
             break
-        products = get_product_info("https://www.nike.com/w/mens-jordan-shoes-37eefznik1zy7ok1")
-        response = get_product_recommendations(products, user_input)
+        
+        if choice == '1':
+            user_input = input("Enter your text query: ").strip()
+            response = get_product_recommendations(products, user_input)
+        
+        elif choice == '2':
+            user_input = input("Enter your text query: ").strip()
+            image_path = upload_image()
+            if image_path:
+                encoded_image = encode_image(image_path)
+                image_analysis = analyze_image(encoded_image)
+                print("Image Analysis:", image_analysis)
+                response = get_product_recommendations(products, user_input)
+            else:
+                response = "No image uploaded."
+        
+        elif choice == '3':
+            user_input = input("Enter your text query: ").strip()
+            response = get_product_recommendations(products, user_input)
+        
+        else:
+            print("Invalid choice. Please try again.")
+            continue
+        
         print("NikeBot:", response)
         speak_text(response)
 
