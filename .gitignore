@@ -9,5 +9,6 @@ __pycache__/
 # Output files
 output.mp3
 
+
 # Environment variables
 .env

@@ -1,10 +1,10 @@
+requests
+beautifulsoup4
 openai
-requests 
-beautifulsoup4 
-pandas 
-pyttsx3 
 python-dotenv
-pillow
-gTTS 
+Pillow
+gtts
 pygame
-
+easygui
+SpeechRecognition
+pydub
