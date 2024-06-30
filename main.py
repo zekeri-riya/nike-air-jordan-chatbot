@@ -10,6 +10,7 @@ def chatbot_interface():
         print("1. Text Query")
         print("2. Image and Text Query")
         print("3. Voice Query")
+        print("4. Text and Voice Query")
         print("Type 'exit' or 'quit' to end the session.")
         
         choice = input("Your choice: ").strip().lower()
@@ -38,6 +39,17 @@ def chatbot_interface():
             user_input = recognize_speech()
             if user_input:
                 response = get_product_recommendations(products, user_input)
+            else:
+                response = "Voice input not recognized."
+
+        elif choice == '4':
+            text_input = input("Enter your text query: ").strip()
+            speak_text("Please provide your voice input after the beep...")
+            print("Please provide your voice input after the beep...")
+            voice_input = recognize_speech()
+            if voice_input:
+                combined_input = text_input + " " + voice_input
+                response = get_product_recommendations(products, combined_input)
             else:
                 response = "Voice input not recognized."
         
