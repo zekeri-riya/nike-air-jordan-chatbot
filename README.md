@@ -1,4 +1,3 @@
-```markdown
 # Nike Air Jordan Collection Chatbot
 
 ## Overview
